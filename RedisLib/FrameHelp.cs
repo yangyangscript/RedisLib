@@ -53,6 +53,24 @@ namespace RedisLib
             }
         }
 
+        /// <summary>
+        /// 获取登陆用户
+        /// </summary>
+        /// <param name="loginName"></param>
+        /// <returns></returns>
+        public static RUserLogin GetLoginUser(string loginName)
+        {
+            try
+            {
+                var db = RedisLib.Config.RedisDbs.AuditFrameDb();
+                return RedisLib.Config.RedisHelper.GetHashItem<RUserLogin>(db, Tables.UserLogin, loginName);
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
+            }
+        }
+
 
         /// <summary>
         /// 部署所有用户

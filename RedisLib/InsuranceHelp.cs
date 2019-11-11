@@ -13,15 +13,35 @@ namespace RedisLib
     {
         private static IDatabase db => RedisLib.Config.RedisDbs.InsuranceDb();
 
+
+        /// <summary>
+        /// 删除日常Key
+        /// </summary>
+        public static void DeleteDailyKeys()
+        {
+            try
+            {               
+                RedisLib.Config.RedisHelper.DeleteKeys(db,
+                    new List<string>()
+                    {
+                        Tabels.UserInfo.ToString()
+                    });
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
+            }
+        }
+
         /// <summary>
         /// 登陆用户
         /// </summary>
         /// <param name="userInfo"></param>
-        public static void UserLogin(RInsuranceUserInfo userInfo)
+        public static void UserLogin(string uId,RInsuranceUserInfo userInfo)
         {
             try
             {
-                RedisLib.Config.RedisHelper.SetHash(db, Tabels.UserInfo, userInfo.Id.ToString(), userInfo);
+                RedisLib.Config.RedisHelper.SetHash(db, Tabels.UserInfo, uId, userInfo);
             }
             catch (Exception e)
             {
@@ -34,15 +54,32 @@ namespace RedisLib
         /// </summary>
         /// <param name="Id"></param>
         /// <returns></returns>
-        public static RInsuranceUserInfo GetLogInfo(int Id)
+        public static RInsuranceUserInfo GetLogInfo(string guid)
         {
             try
             {
-                return RedisLib.Config.RedisHelper.GetHashItem<RInsuranceUserInfo>(db, Tabels.UserInfo, Id.ToString());
+                return RedisLib.Config.RedisHelper.GetHashItem<RInsuranceUserInfo>(db, Tabels.UserInfo, guid);
             }
             catch (Exception e)
             {
                 throw new Exception(e.Message);
+            }
+        }
+
+        /// <summary>
+        /// 获取已登录用户
+        /// </summary>
+        /// <returns></returns>
+        public static long GetLogInfoCounts()
+        {
+            try
+            {
+                return db.HashLength(Tabels.UserInfo.ToString());
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+                throw;
             }
         }
 
@@ -165,7 +202,7 @@ namespace RedisLib
         /// <param name="Id"></param>
         /// <param name="head"></param>
         /// <returns></returns>
-        public static List<RedisLib.Model.Frame.RDept> GetPowerDepts(int Id,string head)
+        public static List<RedisLib.Model.Frame.RDept> GetPowerDepts(string guid,string head)
         {
             try
             {
@@ -180,7 +217,7 @@ namespace RedisLib
                         SortIndex = 0
                     }
                 };
-                var userInfo = GetLogInfo(Id);
+                var userInfo = GetLogInfo(guid);
                 if (userInfo == null) return ret;
                 var allDepts = RedisLib.FrameHelp.GetDepts();
                 //全部数据
@@ -226,9 +263,9 @@ namespace RedisLib
         /// </summary>
         /// <param name="Id"></param>
         /// <returns></returns>
-        public static List<int> CachePowerDeptIds(int Id)
+        public static List<int> CachePowerDeptIds(string guid)
         {
-            var userInfo = GetLogInfo(Id);
+            var userInfo = GetLogInfo(guid);
             if (userInfo == null) return new List<int>();
             //全部数据
             if (userInfo.Poser == 0) return new List<int>(){-1};
@@ -251,10 +288,10 @@ namespace RedisLib
         /// <param name="userId"></param>
         /// <param name="selectDeptId"></param>
         /// <returns></returns>
-        public static List<int> CachePowerDeptIds(int userId, int selectDeptId)
+        public static List<int> CachePowerDeptIds(string guid, int selectDeptId)
         {
-            if (selectDeptId < 1) return CachePowerDeptIds(userId);
-            var userInfo = GetLogInfo(userId);
+            if (selectDeptId < 1) return CachePowerDeptIds(guid);
+            var userInfo = GetLogInfo(guid);
             if(userInfo==null) return new List<int>(){selectDeptId};
             //全部或含下级权限
             if (userInfo.Poser == 0||userInfo.Poser==2)
