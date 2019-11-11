@@ -12,6 +12,28 @@ namespace RedisLib
     /// </summary>
     public static class FrameHelp
     {
+
+        /// <summary>
+        /// 清空所有日常Key
+        /// </summary>
+        public static void DeleteDailyKeys()
+        {
+            try
+            {
+                var db = RedisLib.Config.RedisDbs.AuditFrameDb();
+                RedisLib.Config.RedisHelper.DeleteKeys(db,
+                    new List<string>()
+                    {
+                        RedisLib.Model.Frame.Tables.UserLogin.ToString(), RedisLib.Model.Frame.Tables.Dept.ToString()
+                    });
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
+            }
+        }
+
+
         /// <summary>
         /// 部署所有可以登陆用户
         /// </summary>

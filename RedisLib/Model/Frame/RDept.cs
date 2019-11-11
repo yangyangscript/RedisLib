@@ -11,6 +11,5 @@ namespace RedisLib.Model.Frame
         public int TreeLevel { get; set; }
         public string TreePath { get; set; }
         public int SortIndex { get; set; }
-        public bool EnableSelect { get; set; }
     }
 }

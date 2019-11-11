@@ -177,8 +177,7 @@ namespace RedisLib
                         Name = head,
                         TreeLevel = 0,
                         TreePath = "0",
-                        SortIndex = 0,
-                        EnableSelect =true,
+                        SortIndex = 0
                     }
                 };
                 var userInfo = GetLogInfo(Id);
