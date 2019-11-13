@@ -14,5 +14,8 @@ namespace RedisLib.Model.Frame
         public string Password { get; set; }
 
         public bool Enabled { get; set; }
+
+        public int? DeptId { get; set; }
+        public string DeptName { get; set; }
     }
 }
