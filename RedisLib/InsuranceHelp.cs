@@ -154,7 +154,7 @@ namespace RedisLib
             }
         }
 
-
+        #region 菜单              
         /// <summary>
         /// Load所有菜单
         /// </summary>
@@ -163,7 +163,14 @@ namespace RedisLib
         {
             try
             {
-                var hashItems = items.Select(s => new HashEntry(s.Id, Newtonsoft.Json.JsonConvert.SerializeObject(s)))
+                //菜单永远2级
+                var treeItems = new List<RMenus>();
+                foreach (var item in items.Where(s => s.ParentID == null).OrderBy(s => s.SortIndex))
+                {
+                    treeItems.Add(item);
+                    treeItems.AddRange(items.Where(s => s.ParentID == item.Id).OrderBy(s => s.SortIndex));
+                }               
+                var hashItems = treeItems.Select(s => new HashEntry(s.Id, Newtonsoft.Json.JsonConvert.SerializeObject(s)))
                     .ToArray();
                 db.HashSet(Tabels.Menus.ToString(), hashItems);
             }
@@ -172,7 +179,7 @@ namespace RedisLib
                 throw new Exception(e.Message);
             }
         }
-
+       
 
         /// <summary>
         /// 获取所有菜单
@@ -190,7 +197,7 @@ namespace RedisLib
             }
         }
 
-
+        #endregion
 
 
 
@@ -301,6 +308,6 @@ namespace RedisLib
             return new List<int>() { selectDeptId };
         }
 
-        #endregion
+        #endregion       
     }
 }
