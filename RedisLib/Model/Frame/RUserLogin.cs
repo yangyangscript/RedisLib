@@ -9,6 +9,8 @@ namespace RedisLib.Model.Frame
     {
         public string Name { get; set; }
 
+        public string ChineseName { get; set; }
+
         public int ID { get; set; }
 
         public string Password { get; set; }
