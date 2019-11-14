@@ -119,13 +119,8 @@ namespace RedisLib
         {
             try
             {
-                var db = RedisLib.Config.RedisDbs.AuditFrameDb();
-                var ret = new List<RDept>();
-                foreach (var source in depts.Where(s => s.TreeLevel == 1).OrderBy(s => s.SortIndex))
-                {
-                    CompeleteDeptTree(source, depts, ret);
-                }
-                var hashItems = ret.Select(s => new HashEntry(s.Id, Newtonsoft.Json.JsonConvert.SerializeObject(s)))
+                var db = RedisLib.Config.RedisDbs.AuditFrameDb();               
+                var hashItems = depts.Select(s => new HashEntry(s.Id, Newtonsoft.Json.JsonConvert.SerializeObject(s)))
                     .ToArray();
                 db.HashSet(Tables.Dept.ToString(), hashItems);
             }
@@ -179,6 +174,24 @@ namespace RedisLib
             {
                 var db = RedisLib.Config.RedisDbs.AuditFrameDb();
                 return RedisLib.Config.RedisHelper.GetHashAll<RDept>(db, Tables.Dept);
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
+            }
+        }
+
+        public static List<RDept> GetTreeDepts()
+        {
+            try
+            {
+                var depts = GetDepts();
+                var ret = new List<RDept>();
+                foreach (var source in depts.Where(s => s.TreeLevel == 1).OrderBy(s => s.SortIndex))
+                {
+                    CompeleteDeptTree(source, depts, ret);
+                }
+                return ret;
             }
             catch (Exception e)
             {

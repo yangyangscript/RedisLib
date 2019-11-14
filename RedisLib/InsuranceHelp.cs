@@ -162,15 +162,8 @@ namespace RedisLib
         public static void ReLoadMenus(List<RMenus> items)
         {
             try
-            {
-                //菜单永远2级
-                var treeItems = new List<RMenus>();
-                foreach (var item in items.Where(s => s.ParentID == null).OrderBy(s => s.SortIndex))
-                {
-                    treeItems.Add(item);
-                    treeItems.AddRange(items.Where(s => s.ParentID == item.Id).OrderBy(s => s.SortIndex));
-                }               
-                var hashItems = treeItems.Select(s => new HashEntry(s.Id, Newtonsoft.Json.JsonConvert.SerializeObject(s)))
+            {                              
+                var hashItems = items.Select(s => new HashEntry(s.Id, Newtonsoft.Json.JsonConvert.SerializeObject(s)))
                     .ToArray();
                 db.HashSet(Tabels.Menus.ToString(), hashItems);
             }
@@ -189,7 +182,15 @@ namespace RedisLib
         {
             try
             {
-                return RedisLib.Config.RedisHelper.GetHashAll<RMenus>(db, Tabels.Menus);
+                var items = RedisLib.Config.RedisHelper.GetHashAll<RMenus>(db, Tabels.Menus);
+                //菜单永远2级
+                var treeItems = new List<RMenus>();
+                foreach (var item in items.Where(s => s.ParentID == null).OrderBy(s => s.SortIndex))
+                {
+                    treeItems.Add(item);
+                    treeItems.AddRange(items.Where(s => s.ParentID == item.Id).OrderBy(s => s.SortIndex));
+                }
+                return treeItems;
             }
             catch (Exception e)
             {
@@ -226,13 +227,15 @@ namespace RedisLib
                 };
                 var userInfo = GetLogInfo(guid);
                 if (userInfo == null) return ret;
-                var allDepts = RedisLib.FrameHelp.GetDepts();
+                
                 //全部数据
                 if (userInfo.Poser == 0)
                 {
-                    ret.AddRange(allDepts);
+                    var treeDepts = RedisLib.FrameHelp.GetTreeDepts();
+                    ret.AddRange(treeDepts);
                     return ret;
                 }
+                var allDepts = RedisLib.FrameHelp.GetDepts();
                 var selfDept = allDepts.FirstOrDefault(s => s.Id == (userInfo?.DeptId ?? 0));
                 if (selfDept != null)
                 {
