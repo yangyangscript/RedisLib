@@ -178,10 +178,11 @@ namespace RedisLib
         /// 获取所有菜单
         /// </summary>
         /// <returns></returns>
-        public static List<RMenus> GetMenus()
+        public static List<RMenus> GetMenus(RedisLib.Model.Insurance.RInsuranceUserInfo loginUser)
         {
             try
             {
+                /*
                 var items = RedisLib.Config.RedisHelper.GetHashAll<RMenus>(db, Tabels.Menus);
                 //菜单永远2级
                 var treeItems = new List<RMenus>();
@@ -191,6 +192,9 @@ namespace RedisLib
                     treeItems.AddRange(items.Where(s => s.ParentID == item.Id).OrderBy(s => s.SortIndex));
                 }
                 return treeItems;
+                */
+                //web后端绑定树
+                return RedisLib.Config.RedisHelper.GetHashAll<RMenus>(db, Tabels.Menus);
             }
             catch (Exception e)
             {
