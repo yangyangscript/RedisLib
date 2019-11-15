@@ -24,7 +24,8 @@ namespace RedisLib
                 RedisLib.Config.RedisHelper.DeleteKeys(db,
                     new List<string>()
                     {
-                        Tabels.UserInfo.ToString()
+                        Tabels.UserInfo.ToString(),
+                        Tabels.Menus.ToString(),
                     });
             }
             catch (Exception e)
@@ -110,7 +111,15 @@ namespace RedisLib
         {
             try
             {
-                return RedisLib.Config.RedisHelper.GetHashAll<RCompany>(db, Tabels.Company);
+                var items = RedisLib.Config.RedisHelper.GetHashAll<RCompany>(db, Tabels.Company);
+                //保险公司默认2级
+                var ret = new List<RCompany>();
+                foreach (var fa in items.Where(s=>s.FaId==null).OrderBy(s=>s.SortIndex))
+                {
+                    ret.Add(fa);
+                    ret.AddRange(items.Where(s=>s.FaId==fa.Id).OrderBy(s=>s.SortIndex));
+                }
+                return ret;
             }
             catch (Exception e)
             {
