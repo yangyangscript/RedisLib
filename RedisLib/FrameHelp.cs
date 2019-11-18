@@ -72,6 +72,19 @@ namespace RedisLib
         }
 
 
+        public static List<RUserLogin> GetAllLoginUser()
+        {
+            try
+            {
+                var db = RedisLib.Config.RedisDbs.AuditFrameDb();
+                return RedisLib.Config.RedisHelper.GetHashAll<RUserLogin>(db, Tables.UserLogin);
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
+            }
+        }
+
         /// <summary>
         /// 部署所有用户
         /// </summary>

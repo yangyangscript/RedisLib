@@ -223,7 +223,7 @@ namespace RedisLib
         /// <param name="Id"></param>
         /// <param name="head"></param>
         /// <returns></returns>
-        public static List<RedisLib.Model.Frame.RDept> GetPowerDepts(string guid,string head)
+        public static List<RedisLib.Model.Frame.RDept> GetPowerDepts(RedisLib.Model.Insurance.RInsuranceUserInfo userInfo, string head)
         {
             try
             {
@@ -237,10 +237,7 @@ namespace RedisLib
                         TreePath = "0",
                         SortIndex = 0
                     }
-                };
-                var userInfo = GetLogInfo(guid);
-                if (userInfo == null) return ret;
-                
+                };               
                 //全部数据
                 if (userInfo.Poser == 0)
                 {
