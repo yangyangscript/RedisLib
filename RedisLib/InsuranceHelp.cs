@@ -283,9 +283,8 @@ namespace RedisLib
         /// </summary>
         /// <param name="Id"></param>
         /// <returns></returns>
-        public static List<int> CachePowerDeptIds(string guid)
-        {
-            var userInfo = GetLogInfo(guid);
+        public static List<int> GetPowerDeptIds(RedisLib.Model.Insurance.RInsuranceUserInfo userInfo)
+        {           
             if (userInfo == null) return new List<int>();
             //全部数据
             if (userInfo.Poser == 0) return new List<int>(){-1};
@@ -308,10 +307,9 @@ namespace RedisLib
         /// <param name="userId"></param>
         /// <param name="selectDeptId"></param>
         /// <returns></returns>
-        public static List<int> CachePowerDeptIds(string guid, int selectDeptId)
+        public static List<int> GetPowerDeptIds(RedisLib.Model.Insurance.RInsuranceUserInfo userInfo, int selectDeptId)
         {
-            if (selectDeptId < 1) return CachePowerDeptIds(guid);
-            var userInfo = GetLogInfo(guid);
+            if (selectDeptId < 1) return GetPowerDeptIds(userInfo);
             if(userInfo==null) return new List<int>(){selectDeptId};
             //全部或含下级权限
             if (userInfo.Poser == 0||userInfo.Poser==2)
