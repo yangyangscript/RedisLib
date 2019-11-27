@@ -26,6 +26,7 @@ namespace RedisLib
                     {
                         Tabels.UserInfo.ToString(),
                         Tabels.Menus.ToString(),
+                        Tabels.Company.ToString(),
                     });
             }
             catch (Exception e)
@@ -144,6 +145,20 @@ namespace RedisLib
             }
         }
 
+
+        /// <summary>
+        /// 获取保险公司
+        /// </summary>
+        /// <param name="companyName"></param>
+        /// <returns></returns>
+        public static RCompany GetCompany(string companyName)
+        {
+            var all = GetCompanies();
+            var item = all.FirstOrDefault(s =>
+                s.FaId != null && !string.IsNullOrEmpty(s.SearchKey) && companyName.Contains(s.SearchKey));
+            if (item != null) return item;
+            return all.FirstOrDefault(s=>s.Id==1);
+        }
 
         /// <summary>
         /// Load所有角色权限
