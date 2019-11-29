@@ -27,6 +27,7 @@ namespace RedisLib
                         Tabels.UserInfo.ToString(),
                         Tabels.Menus.ToString(),
                         Tabels.Company.ToString(),
+                        Tabels.RolePower.ToString(),
                     });
             }
             catch (Exception e)
@@ -112,7 +113,7 @@ namespace RedisLib
         {
             try
             {
-                var items = RedisLib.Config.RedisHelper.GetHashAll<RCompany>(db, Tabels.Company);
+                var items = RedisLib.Config.RedisHelper.GetHashAll<RCompany>(db, Tabels.Company).Where(s=>s.Id>1).ToList();
                 //保险公司默认2级
                 var ret = new List<RCompany>();
                 foreach (var fa in items.Where(s=>s.FaId==null).OrderBy(s=>s.SortIndex))
@@ -157,20 +158,51 @@ namespace RedisLib
             var item = all.FirstOrDefault(s =>
                 s.FaId != null && !string.IsNullOrEmpty(s.SearchKey) && companyName.Contains(s.SearchKey));
             if (item != null) return item;
-            return all.FirstOrDefault(s=>s.Id==1);
+            return new RCompany(){Id = 1,Enable = false,FaId = null,Name = "测试推送使用",Remark = "",SearchKey = "",SortIndex = -100};
+        }
+
+        /// <summary>
+        /// 下拉保险公司Id
+        /// </summary>
+        /// <param name="Id"></param>
+        /// <returns></returns>
+        public static List<int> GetCompanyIds(int Id)
+        {
+            var all = GetCompanies();
+            return all.Where(s => s.Id == Id || s.FaId == Id).Select(s => s.Id).ToList();
         }
 
         /// <summary>
         /// Load所有角色权限
         /// </summary>
         /// <param name="items"></param>
-        public static void ReloadRolePower(List<RRolePower> items)
+        public static void ReloadRolePower(List<RRolePower> items, bool deleteKey = false)
         {
             try
             {
+                if (deleteKey) RedisLib.Config.RedisHelper.DeleteKey(db, Tabels.RolePower.ToString());
                 var hashItems = items.Select(s => new HashEntry(s.RoleId, Newtonsoft.Json.JsonConvert.SerializeObject(s)))
                     .ToArray();
                 db.HashSet(Tabels.RolePower.ToString(), hashItems);
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
+            }
+        }
+
+        /// <summary>
+        /// 获取所有角色权限
+        /// </summary>
+        /// <param name="userInfo"></param>
+        /// <returns></returns>
+        public static List<string> GetRolePower(RInsuranceUserInfo userInfo)
+        {
+            try
+            {          
+                if(!userInfo.RoleId.HasValue) return new List<string>();
+                var rolePower = RedisLib.Config.RedisHelper.GetHashItem<RRolePower>(db, Tabels.RolePower, userInfo.RoleId.ToString());
+                return rolePower.Powers;
             }
             catch (Exception e)
             {
@@ -183,10 +215,11 @@ namespace RedisLib
         /// Load所有菜单
         /// </summary>
         /// <param name="items"></param>
-        public static void ReLoadMenus(List<RMenus> items)
+        public static void ReLoadMenus(List<RMenus> items,bool deleteKey = false)
         {
             try
-            {                              
+            {
+                if (deleteKey) RedisLib.Config.RedisHelper.DeleteKey(db, Tabels.Menus.ToString());
                 var hashItems = items.Select(s => new HashEntry(s.Id, Newtonsoft.Json.JsonConvert.SerializeObject(s)))
                     .ToArray();
                 db.HashSet(Tabels.Menus.ToString(), hashItems);
@@ -202,7 +235,7 @@ namespace RedisLib
         /// 获取所有菜单
         /// </summary>
         /// <returns></returns>
-        public static List<RMenus> GetMenus(RedisLib.Model.Insurance.RInsuranceUserInfo loginUser)
+        public static List<RMenus> GetMenus()
         {
             try
             {

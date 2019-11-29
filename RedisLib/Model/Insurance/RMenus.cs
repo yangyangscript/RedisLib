@@ -24,5 +24,10 @@ namespace RedisLib.Model.Insurance
         public int? PowerId { get; set; }
 
         public string PowerName { get; set; }
+
+        [Newtonsoft.Json.JsonIgnore]
+        public int TreeLevel {
+            get { return this.ParentID.HasValue ? 1 : 0; }
+        }
     }
 }
