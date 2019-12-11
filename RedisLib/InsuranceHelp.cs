@@ -162,6 +162,16 @@ namespace RedisLib
         }
 
         /// <summary>
+        /// 获取保险公司
+        /// </summary>
+        /// <param name="Id"></param>
+        /// <returns></returns>
+        public static RCompany GetCompanyById(int Id)
+        {
+            return RedisLib.Config.RedisHelper.GetHashItem<RCompany>(db, Tabels.Company, Id.ToString());
+        }
+
+        /// <summary>
         /// 下拉保险公司Id
         /// </summary>
         /// <param name="Id"></param>
