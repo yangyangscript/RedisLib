@@ -53,6 +53,24 @@ namespace RedisLib
             }
         }
 
+
+        /// <summary>
+        /// 跟新单个可以登陆用户
+        /// </summary>
+        /// <param name="userLogin"></param>
+        public static void UpdateLoginUser(RUserLogin userLogin)
+        {
+            try
+            {
+                var db = RedisLib.Config.RedisDbs.AuditFrameDb();
+                RedisLib.Config.RedisHelper.SetHash(db, RedisLib.Model.Frame.Tables.UserLogin, userLogin.Name, userLogin);
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
+            }
+        }
+
         /// <summary>
         /// 获取登陆用户
         /// </summary>
