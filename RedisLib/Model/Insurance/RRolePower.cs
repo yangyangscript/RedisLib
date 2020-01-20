@@ -9,9 +9,10 @@ namespace RedisLib.Model.Insurance
     {
         public int RoleId { get; set; }
 
-        [Newtonsoft.Json.JsonIgnore]
+        
         public string PowersStr { get; set; }
 
+        [Newtonsoft.Json.JsonIgnore]
         public List<string> Powers {
             get
             {
